@@ -52,6 +52,14 @@ export class User {
     )
   }
 
+  getLoggedUserId(): number | null {
+  const token = localStorage.getItem('utoken');
+  if (!token) return null;
+
+  const decoded = getDecodedAccessToken();
+  return decoded?.id || null;
+}
+
   getUserProfil(idUser: any){
     return firstValueFrom(
       this.httpClient.get<any>(`${this.baseUrl}/userprofil/` + idUser, createHeaders())

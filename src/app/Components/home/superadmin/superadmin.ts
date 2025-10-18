@@ -1,11 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router'; 
 
 @Component({
   selector: 'app-superadmin',
-  imports: [],
+  imports: [CommonModule, RouterModule],
+  standalone: true,
   templateUrl: './superadmin.html',
-  styleUrl: './superadmin.css'
+  styleUrls: ['./superadmin.css']
 })
-export class Superadmin {
+export class Superadmin implements OnInit {
+
+  ngOnInit(): void {
+    
+  }
 
 }

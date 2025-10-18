@@ -1,0 +1,146 @@
+<div class="equipos-container">
+  <h1>Listado de Equipos</h1>
+
+  <div class="filtro-bar">
+  <input type="text" [(ngModel)]="filterText" (ngModelChange)="filterTeams()" placeholder="Buscar equipo..."
+    class="filtro-input" />
+  <button class="btn-ver-todos" (click)="loadTeams()">Actualizar Tabla</button>
+  </div>
+<div class="table-container">
+  <table class="tabla-equipos">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Marca</th>
+        <th>Modelo</th>
+        <th>Serie</th>
+        <th>Registro Invima</th>
+        <th>Riesgo</th>
+        <th>Ubicación</th>
+        <th>Tipo - Servicio</th>
+        <th>Sede</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let team of filteredTeams">
+        <td>{{ team.id }}</td>
+        <td>{{ team.nombres }}</td>
+        <td>{{ team.marca }}</td>
+        <td>{{ team.modelo }}</td>
+        <td>{{ team.serie }}</td>
+        <td>{{ team.registroInvima }}</td>
+        <td>{{ team.riesgo }}</td>
+        <td>{{ team.ubicacion }} {{ team.ubicacionEspecifica }}</td>
+        <td>{{ team.tipoEquipos?.nombres }} - {{ team.servicios?.nombres }}</td>
+        <td>{{ team.sedes?.nombres }}</td>
+        <td>{{ team.activo ? 'Activo' : 'Inactivo' }}</td>
+        <td>
+          <button class="btn-editar" (click)="openModal(team)">Editar</button>
+          <button class="btn-eliminar" (click)="toggleTeamActive(team)">
+            {{ team.activo ? 'Deshabilitar' : 'Habilitar' }}
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<!-- Modal para editar equipo -->
+<div class="modal" [class.show]="isModalVisible">
+  <div class="modal-content">
+    <span class="close" (click)="closeModal()">&times;</span>
+    <h2>Editar Equipo</h2>
+    <form (ngSubmit)="saveChanges($event); closeModal();" class="form-grid">
+      <div>
+        <label>Nombre:</label>
+        <input type="text" [(ngModel)]="selectedTeam.nombres" name="nombres" required />
+      </div>
+
+      <div>
+        <label>Marca:</label>
+        <input type="text" [(ngModel)]="selectedTeam.marca" name="marca" required />
+      </div>
+
+      <div>
+        <label>Modelo:</label>
+        <input type="text" [(ngModel)]="selectedTeam.modelo" name="modelo" />
+      </div>
+
+      <div>
+        <label>Serie:</label>
+        <input type="text" [(ngModel)]="selectedTeam.serie" name="serie" />
+      </div>
+
+      <div>
+        <label>Placa:</label>
+        <input type="text" [(ngModel)]="selectedTeam.placa" name="placa" />
+      </div>
+
+      <div>
+        <label>Registro Invima:</label>
+        <input type="text" [(ngModel)]="selectedTeam.registroInvima" name="registroInvima" />
+      </div>
+
+      <div>
+        <label>Riesgo:</label>
+        <input type="text" [(ngModel)]="selectedTeam.riesgo" name="riesgo" />
+      </div>
+
+      <div>
+        <label>Ubicación:</label>
+        <input type="text" [(ngModel)]="selectedTeam.ubicacion" name="ubicacion" />
+      </div>
+
+      <div>
+        <label>Ubicación Específica:</label>
+        <input type="text" [(ngModel)]="selectedTeam.ubicacionEspecifica" name="ubicacionEspecifica" />
+      </div>
+
+      <div>
+        <label>Periodicidad M:</label>
+        <input type="number" [(ngModel)]="selectedTeam.periodicidadM" name="periodicidadM" />
+      </div>
+
+      <div>
+        <label>Periodicidad C:</label>
+        <input type="number" [(ngModel)]="selectedTeam.periodicidadC" name="periodicidadC" />
+      </div>
+
+      <div>
+        <label>Calibración:</label>
+        <input type="number" [(ngModel)]="selectedTeam.calibracion" name="calibracion" />
+      </div>
+
+      <div>
+        <label>Tipo de Equipo:</label>
+        <select [(ngModel)]="selectedTeam.tipoEquipoIdFk" name="tipoEquipoIdFk" required>
+          <option *ngFor="let type of teamTypes" [value]="type.id">{{ type.nombres }}</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Servicio:</label>
+        <select [(ngModel)]="selectedTeam.servicioIdFk" name="servicioIdFk" required>
+          <option *ngFor="let service of services" [value]="service.id">{{ service.nombres }}</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Sede:</label>
+        <select [(ngModel)]="selectedTeam.sedeIdFk" name="sedeIdFk" required>
+          <option *ngFor="let branch of branches" [value]="branch.id">{{ branch.nombres }}</option>
+        </select>
+      </div>
+
+      <div class="col-span-2">
+        <button type="submit" class="btn-guardar">Guardar Cambios</button>
+      </div>
+    </form>
+
+  </div>
+
+</div>

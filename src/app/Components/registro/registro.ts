@@ -7,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrl: './registro.css'
 })
 export class Registro {
-
+  
 }

@@ -1,0 +1,77 @@
+<div class="check-report-container">
+  <h1>Registro de Reporte de Chequeos</h1>
+
+  <div class="filtro-bar">
+  <input 
+    type="text" 
+    class="filtro-input"
+    placeholder="Buscar reporte por equipo, usuario o estado..."
+    [(ngModel)]="filterText"
+    (ngModelChange)="filterReports()" 
+  />
+
+  <button class="btn-guardar" (click)="openModal()">Agregar Nuevo Chequeo</button>
+  <button class="btn-ver-todos" (click)="loadReports()">Actualizar Tabla</button>
+</div>
+
+
+  <!-- Tabla de reportes -->
+  <div class="table-container">
+    <table class="tabla-equipos" *ngIf="!loading && filteredReports.length > 0; else noReports">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Equipo</th>
+          <th>Modelo</th>
+          <th>Ubicacion</th>
+          <th>Usuario</th>
+          <th>Estado</th>
+          <th>Observaciones</th>
+          <th>Fecha/Hora</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of filteredReports">
+          <td>{{ r.id }}</td>
+          <td>{{ r.Equipo?.nombres }}</td>
+          <td>{{ r.Equipo?.modelo }}</td>
+          <td>{{ r.Equipo?.ubicacion }} {{ r.Equipo?.ubicacionEspecifica }}</td>
+          <td>{{ r.User?.nombres }}</td>
+          <td>{{ r.estado }}</td>
+          <td>{{ r.observaciones }}</td>
+          <td>{{ r.fecha_hora | date:'short' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+
+  <!-- Modal para agregar nuevo reporte -->
+  <div class="modal" [class.show]="isModalVisible">
+    <div class="modal-content">
+      <span class="close" (click)="closeModal()">&times;</span>
+      <h2>Nuevo Chequeo</h2>
+
+      <form (ngSubmit)="saveReport(); closeModal()">
+        <label>Equipo:</label>
+        <select [(ngModel)]="equipoId" name="equipoId" required>
+          <option *ngFor="let e of equipos" [value]="e.id">{{ e.nombres }}</option>
+        </select>
+
+        <label>Estado:</label>
+        <input type="text" [(ngModel)]="estado" name="estado" required />
+
+        <label>Observaciones:</label>
+        <textarea [(ngModel)]="observaciones" name="observaciones"></textarea>
+
+        <button type="submit" class="btn-guardar">Guardar Chequeo</button>
+      </form>
+    </div>
+  </div>
+
+  <ng-template #noReports>
+    <p *ngIf="!loading">No hay reportes que coincidan con la búsqueda.</p>
+  </ng-template>
+
+</div>

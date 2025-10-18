@@ -1,0 +1,71 @@
+<div class="nuevo-equipo-container">
+  <button class="btn-close" (click)="goHome()">X</button>
+  <h2>Crear Nuevo Equipo</h2>
+
+  <form (ngSubmit)="saveTeam()">
+    <label>Nombre:</label>
+    <input type="text" [(ngModel)]="team.nombres" name="nombres" required />
+
+    <label>Marca:</label>
+    <input type="text" [(ngModel)]="team.marca" name="marca" required />
+
+    <label>Modelo:</label>
+    <input type="text" [(ngModel)]="team.modelo" name="modelo" required />
+
+    <label>Serie:</label>
+    <input type="text" [(ngModel)]="team.serie" name="serie" required />
+
+    <label>Placa:</label>
+    <input type="text" [(ngModel)]="team.placa" name="placa" required />
+
+    <label>Registro Invima:</label>
+    <input type="text" [(ngModel)]="team.registroInvima" name="registroInvima" />
+
+    <label>Riesgo:</label>
+    <select [(ngModel)]="team.riesgo" name="riesgo">
+      <option value="NA">NA</option>
+      <option value="I">I</option>
+      <option value="IIA">IIA</option>
+      <option value="IIB">IIB</option>
+      <option value="III">III</option>
+    </select>
+
+    <label>Ubicación:</label>
+    <input type="text" [(ngModel)]="team.ubicacion" name="ubicacion" required />
+
+    <label>Ubicación específica:</label>
+    <input type="text" [(ngModel)]="team.ubicacionEspecifica" name="ubicacionEspecifica" required />
+
+    <label>Periodicidad M:</label>
+    <input type="number" [(ngModel)]="team.periodicidadM" name="periodicidadM" required />
+
+    <label>Periodicidad C:</label>
+    <input type="number" [(ngModel)]="team.periodicidadC" name="periodicidadC" required />
+
+    <label>Calibración:</label>
+    <input type="number" [(ngModel)]="team.calibracion" name="calibracion" />
+
+    <label>Calificación:</label>
+    <input type="number" [(ngModel)]="team.calificacion" name="calificacion" />
+
+    <label>Validación:</label>
+    <input type="number" [(ngModel)]="team.validacion" name="validacion" />
+
+    <label>Tipo de Equipo:</label>
+    <select [(ngModel)]="team.tipoEquipoIdFk" name="tipoEquipoIdFk" required>
+      <option *ngFor="let type of teamTypes" [value]="type.id">{{ type.nombres }}</option>
+    </select>
+
+    <label>Servicio:</label>
+    <select [(ngModel)]="team.servicioIdFk" name="servicioIdFk" required>
+      <option *ngFor="let service of services" [value]="service.id">{{ service.nombres }}</option>
+    </select>
+
+    <label>Sede:</label>
+    <select [(ngModel)]="team.sedeIdFk" name="sedeIdFk" required>
+      <option *ngFor="let branch of branches" [value]="branch.id">{{ branch.nombres }}</option>
+    </select>
+
+    <button type="submit" class="btn-guardar">Crear Equipo</button>
+  </form>
+</div>

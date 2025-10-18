@@ -1,4 +1,4 @@
 // Server Backend
-export const API_URL = 'http://172.30.20.18:3005';
+export const API_URL = 'http://localhost:3005';
 
 

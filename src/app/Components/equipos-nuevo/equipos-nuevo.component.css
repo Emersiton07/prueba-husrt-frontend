@@ -1,0 +1,118 @@
+/* Contenedor principal */
+.nuevo-equipo-container {
+  max-width: 900px;
+  margin: 30px auto;
+  background: linear-gradient(135deg, #f9f9f9, #ffffff);
+  padding: 30px 35px;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  transition: transform 0.3s ease;
+}
+
+.nuevo-equipo-container:hover {
+  transform: translateY(-2px);
+}
+
+/* Título */
+.nuevo-equipo-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 2rem;
+  color: #1e3a8a;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Formulario en grid */
+.nuevo-equipo-container form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 30px;
+}
+
+/* Labels */
+.nuevo-equipo-container label {
+  display: block;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 6px;
+  transition: color 0.3s;
+}
+
+.nuevo-equipo-container input:focus + label,
+.nuevo-equipo-container select:focus + label {
+  color: #1e3a8a;
+}
+
+/* Inputs y selects */
+.nuevo-equipo-container input,
+.nuevo-equipo-container select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.nuevo-equipo-container input:focus,
+.nuevo-equipo-container select:focus {
+  border-color: #1e3a8a;
+  box-shadow: 0 0 8px rgba(30, 58, 138, 0.3);
+}
+
+/* Placeholder */
+.nuevo-equipo-container input::placeholder {
+  color: #aaa;
+  font-style: italic;
+}
+
+/* Botón Crear Equipo */
+.btn-guardar {
+  grid-column: 1 / -1;
+  padding: 14px 0;
+  background: linear-gradient(90deg, #1e3a8a, #3b82f6);
+  color: white;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(30,58,138,0.3);
+}
+
+.btn-guardar:hover {
+  background: linear-gradient(90deg, #3b82f6, #1e3a8a);
+  transform: translateY(-2px);
+  box-shadow: 0 7px 20px rgba(30,58,138,0.4);
+}
+
+.btn-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  font-size: 1.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  color: red;
+  transition: all 0.2s ease;
+}
+
+.btn-close:hover {
+  color: red;
+  transform: scale(1.2);
+}
+
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nuevo-equipo-container form {
+    grid-template-columns: 1fr;
+  }
+}
