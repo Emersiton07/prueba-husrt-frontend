@@ -13,21 +13,33 @@ export class EquipoService {
 
   constructor() {
     this.baseUrl = API_URL;
-   }
+  }
 
-   getToken(){
-    return localStorage.getItem('utoken');
-   }
+  getToken() {
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      return localStorage.getItem('utoken');
+    }
+    return null;
+  }
 
-   getTeams(): Observable<any []>{    
+
+  getTeams(): Observable<any[]> {
+    if (typeof window === 'undefined') {
+      // SSR: devuelve observable vacío
+      return new Observable(observer => {
+        observer.next([]);
+        observer.complete();
+      });
+    }
     return this.httpClient.get<any[]>(`${this.baseUrl}/equipos`, createHeaders());
   }
+
 
   addTeam(equipoData: any): Observable<any> {
     return this.httpClient.post<any>(`${this.baseUrl}/addequipo`, equipoData, createHeaders());
   }
 
-  editTeam(id: number, equipoData: any){
+  editTeam(id: number, equipoData: any) {
     return this.httpClient.put<any>(
       `${this.baseUrl}/actequipo/${id}`,
       equipoData,

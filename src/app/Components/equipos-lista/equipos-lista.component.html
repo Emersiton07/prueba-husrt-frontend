@@ -1,146 +1,140 @@
-<div class="equipos-container">
-  <h1>Listado de Equipos</h1>
+<div class="container mt-4">
+  <h1 class="text-center mb-4 text-primary fw-bold">Listado de Equipos</h1>
 
-  <div class="filtro-bar">
-  <input type="text" [(ngModel)]="filterText" (ngModelChange)="filterTeams()" placeholder="Buscar equipo..."
-    class="filtro-input" />
-  <button class="btn-ver-todos" (click)="loadTeams()">Actualizar Tabla</button>
+  <div class="d-flex mb-3 justify-content-between align-items-center">
+    <input
+      type="text"
+      [(ngModel)]="filterText"
+      (ngModelChange)="loadTeams()"
+      class="form-control w-50"
+      placeholder="Buscar equipo..."
+    />
   </div>
-<div class="table-container">
-  <table class="tabla-equipos">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Marca</th>
-        <th>Modelo</th>
-        <th>Serie</th>
-        <th>Registro Invima</th>
-        <th>Riesgo</th>
-        <th>Ubicación</th>
-        <th>Tipo - Servicio</th>
-        <th>Sede</th>
-        <th>Estado</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let team of filteredTeams">
-        <td>{{ team.id }}</td>
-        <td>{{ team.nombres }}</td>
-        <td>{{ team.marca }}</td>
-        <td>{{ team.modelo }}</td>
-        <td>{{ team.serie }}</td>
-        <td>{{ team.registroInvima }}</td>
-        <td>{{ team.riesgo }}</td>
-        <td>{{ team.ubicacion }} {{ team.ubicacionEspecifica }}</td>
-        <td>{{ team.tipoEquipos?.nombres }} - {{ team.servicios?.nombres }}</td>
-        <td>{{ team.sedes?.nombres }}</td>
-        <td>{{ team.activo ? 'Activo' : 'Inactivo' }}</td>
-        <td>
-          <button class="btn-editar" (click)="openModal(team)">Editar</button>
-          <button class="btn-eliminar" (click)="toggleTeamActive(team)">
-            {{ team.activo ? 'Deshabilitar' : 'Habilitar' }}
+
+  <div class="table-responsive shadow-sm rounded-4 overflow-hidden">
+    <table class="table table-hover text-center table-custom">
+      <thead class="table-primary">
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Marca</th>
+          <th>Modelo</th>
+          <th>Serie</th>
+          <th>Registro Invima</th>
+          <th>Riesgo</th>
+          <th>Ubicación</th>
+          <th>Tipo - Servicio</th>
+          <th>Sede</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let team of (teams$ | async)">
+          <td>{{ team.id }}</td>
+          <td>{{ team.nombres }}</td>
+          <td>{{ team.marca }}</td>
+          <td>{{ team.modelo }}</td>
+          <td>{{ team.serie }}</td>
+          <td>{{ team.registroInvima }}</td>
+          <td>{{ team.riesgo }}</td>
+          <td>{{ team.ubicacion }} {{ team.ubicacionEspecifica }}</td>
+          <td>{{ team.tipoEquipos?.nombres }} - {{ team.servicios?.nombres }}</td>
+          <td>{{ team.sedes?.nombres }}</td>
+          <td>
+            <span [class.text-success]="team.activo" [class.text-danger]="!team.activo">
+              {{ team.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <td>
+            <button
+              class="btn btn-sm btn-outline-warning me-1 fw-semibold"
+              (click)="openModal(team)"
+            >
+              Editar
+            </button>
+            <button
+              class="btn btn-sm fw-semibold"
+              [ngClass]="team.activo ? 'btn-outline-danger' : 'btn-outline-success'"
+              (click)="toggleTeamActive(team)"
+            >
+              {{ team.activo ? 'Deshabilitar' : 'Habilitar' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  
+</div>
+
+
+<!-- 🟦 Modal Bootstrap -->
+<div class="modal fade" id="editTeamModal" tabindex="-1" aria-labelledby="editTeamModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow-lg border-0 rounded-3">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title fw-semibold" id="editTeamModalLabel">
+          <i class="bi bi-pencil-square"></i> Editar Equipo
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
+      </div>
+
+      <form (ngSubmit)="saveChanges()">
+        <div class="modal-body">
+          <div class="row g-3">
+            <!-- Reutilizamos tus inputs -->
+            <div class="col-md-6" *ngFor="let field of [
+              {label:'Nombre', name:'nombres'},
+              {label:'Marca', name:'marca'},
+              {label:'Modelo', name:'modelo'},
+              {label:'Serie', name:'serie'},
+              {label:'Registro Invima', name:'registroInvima'},
+              {label:'Riesgo', name:'riesgo'},
+              {label:'Ubicación', name:'ubicacion'},
+              {label:'Ubicación Específica', name:'ubicacionEspecifica'}
+            ]">
+              <label class="form-label">{{ field.label }}</label>
+              <input type="text" [(ngModel)]="selectedTeam[field.name]" [name]="field.name"
+                class="form-control form-control-sm" />
+            </div>
+
+            <!-- Selects -->
+            <div class="col-md-4">
+              <label class="form-label">Tipo de Equipo</label>
+              <select [(ngModel)]="selectedTeam.tipoEquipoIdFk" name="tipoEquipoIdFk" class="form-select form-select-sm"
+                required>
+                <option *ngFor="let type of teamTypes" [value]="type.id">{{ type.nombres }}</option>
+              </select>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Servicio</label>
+              <select [(ngModel)]="selectedTeam.servicioIdFk" name="servicioIdFk" class="form-select form-select-sm"
+                required>
+                <option *ngFor="let service of services" [value]="service.id">{{ service.nombres }}</option>
+              </select>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Sede</label>
+              <select [(ngModel)]="selectedTeam.sedeIdFk" name="sedeIdFk" class="form-select form-select-sm" required>
+                <option *ngFor="let branch of branches" [value]="branch.id">{{ branch.nombres }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" (click)="closeModal()">
+            <i class="bi bi-x-circle"></i> Cerrar
           </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-</div>
-
-<!-- Modal para editar equipo -->
-<div class="modal" [class.show]="isModalVisible">
-  <div class="modal-content">
-    <span class="close" (click)="closeModal()">&times;</span>
-    <h2>Editar Equipo</h2>
-    <form (ngSubmit)="saveChanges($event); closeModal();" class="form-grid">
-      <div>
-        <label>Nombre:</label>
-        <input type="text" [(ngModel)]="selectedTeam.nombres" name="nombres" required />
-      </div>
-
-      <div>
-        <label>Marca:</label>
-        <input type="text" [(ngModel)]="selectedTeam.marca" name="marca" required />
-      </div>
-
-      <div>
-        <label>Modelo:</label>
-        <input type="text" [(ngModel)]="selectedTeam.modelo" name="modelo" />
-      </div>
-
-      <div>
-        <label>Serie:</label>
-        <input type="text" [(ngModel)]="selectedTeam.serie" name="serie" />
-      </div>
-
-      <div>
-        <label>Placa:</label>
-        <input type="text" [(ngModel)]="selectedTeam.placa" name="placa" />
-      </div>
-
-      <div>
-        <label>Registro Invima:</label>
-        <input type="text" [(ngModel)]="selectedTeam.registroInvima" name="registroInvima" />
-      </div>
-
-      <div>
-        <label>Riesgo:</label>
-        <input type="text" [(ngModel)]="selectedTeam.riesgo" name="riesgo" />
-      </div>
-
-      <div>
-        <label>Ubicación:</label>
-        <input type="text" [(ngModel)]="selectedTeam.ubicacion" name="ubicacion" />
-      </div>
-
-      <div>
-        <label>Ubicación Específica:</label>
-        <input type="text" [(ngModel)]="selectedTeam.ubicacionEspecifica" name="ubicacionEspecifica" />
-      </div>
-
-      <div>
-        <label>Periodicidad M:</label>
-        <input type="number" [(ngModel)]="selectedTeam.periodicidadM" name="periodicidadM" />
-      </div>
-
-      <div>
-        <label>Periodicidad C:</label>
-        <input type="number" [(ngModel)]="selectedTeam.periodicidadC" name="periodicidadC" />
-      </div>
-
-      <div>
-        <label>Calibración:</label>
-        <input type="number" [(ngModel)]="selectedTeam.calibracion" name="calibracion" />
-      </div>
-
-      <div>
-        <label>Tipo de Equipo:</label>
-        <select [(ngModel)]="selectedTeam.tipoEquipoIdFk" name="tipoEquipoIdFk" required>
-          <option *ngFor="let type of teamTypes" [value]="type.id">{{ type.nombres }}</option>
-        </select>
-      </div>
-
-      <div>
-        <label>Servicio:</label>
-        <select [(ngModel)]="selectedTeam.servicioIdFk" name="servicioIdFk" required>
-          <option *ngFor="let service of services" [value]="service.id">{{ service.nombres }}</option>
-        </select>
-      </div>
-
-      <div>
-        <label>Sede:</label>
-        <select [(ngModel)]="selectedTeam.sedeIdFk" name="sedeIdFk" required>
-          <option *ngFor="let branch of branches" [value]="branch.id">{{ branch.nombres }}</option>
-        </select>
-      </div>
-
-      <div class="col-span-2">
-        <button type="submit" class="btn-guardar">Guardar Cambios</button>
-      </div>
-    </form>
-
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save"></i> Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
-
 </div>

@@ -14,17 +14,21 @@ export class ReportService {
 
   constructor() {
     this.baseUrl = API_URL;
-   }
+  }
 
-   getToken(){
-    return localStorage.getItem('utoken');
-   }
+  getToken() {
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      return localStorage.getItem('utoken');
+    }
+    return null;
+  }
 
-   getReports(): Observable<any[]> {
+
+  getReports(): Observable<any[]> {
     return this.httpClient.get<any[]>(`${this.baseUrl}/reports`, createHeaders());
   }
 
   addReport(report: any): Observable<any[]> {
-    return this.httpClient.post<any[]>(`${this.baseUrl}/addreport`,report, createHeaders());
+    return this.httpClient.post<any[]>(`${this.baseUrl}/addreport`, report, createHeaders());
   }
 }

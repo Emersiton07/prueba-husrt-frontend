@@ -1,61 +1,72 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Observable, BehaviorSubject, switchMap, map } from 'rxjs';
+import Swal from 'sweetalert2';
+
+declare var bootstrap: any;
+
 import { ReportService } from '../../Services/appServices/checkReportServices/report.service';
 import { EquipoService } from '../../Services/appServices/equipoServices/equipo';
 import { User } from '../../Services/appServices/userServices/user';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-checkreport',
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './checkreport.component.html',
   styleUrls: ['./checkreport.component.css']
 })
 export class CheckreportComponent implements OnInit {
+  private refresh$ = new BehaviorSubject<void>(undefined);
+  reports$!: Observable<any[]>;
+
   equipos: any[] = [];
-  reports: any[] = [];
-  filteredReports: any[] = [];
   filterText = '';
 
-  // Modal
-  isModalVisible = false;
+  private modalRef: any;
 
-  // Nuevo reporte
   estado = '';
   observaciones = '';
   equipoId!: number;
   userId!: number;
 
-  loading = true;
+  private isBrowser = false;
 
   constructor(
     private reportService: ReportService,
     private equipoService: EquipoService,
-    private userService: User
-  ) {}
+    private userService: User,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+  }
 
   ngOnInit() {
+    if (!this.isBrowser) return;
+
     this.userId = this.userService.getLoggedUserId() ?? 0;
+
+    this.reports$ = this.refresh$.pipe(
+      switchMap(() =>
+        this.reportService.getReports().pipe(
+          map(reports => this.filterReports(reports))
+        )
+      )
+    );
+
+    this.equipoService.getTeams().subscribe(data => (this.equipos = data));
+
+    import('bootstrap').then(b => ((window as any).bootstrap = b));
+
     this.loadReports();
-    this.loadEquipos();
   }
 
-  loadReports() {
-    this.reportService.getReports().subscribe(data => {
-      console.log(data);
-      this.reports = data;
-      this.filteredReports = [...this.reports];
-      this.loading = false;
-    });
-  }
+  filterReports(reports: any[]): any[] {
+    const search = this.filterText.trim().toLowerCase();
+    if (!search) return reports;
 
-  loadEquipos() {
-    this.equipoService.getTeams().subscribe(data => {this.equipos = data; });
-  }
-
-  filterReports() {
-    const search = this.filterText.toLowerCase();
-    this.filteredReports = this.reports.filter(r =>
+    return reports.filter(r =>
       r.Equipo?.nombres?.toLowerCase().includes(search) ||
       r.User?.nombres?.toLowerCase().includes(search) ||
       r.estado?.toLowerCase().includes(search) ||
@@ -63,20 +74,28 @@ export class CheckreportComponent implements OnInit {
     );
   }
 
+  loadReports() {
+    this.refresh$.next();
+  }
 
   openModal() {
-    this.isModalVisible = true;
-    this.estado = '';
-    this.observaciones = '';
-    this.equipoId = 0;
+    if (!this.isBrowser) return;
+    const modalEl = document.getElementById('addReportModal');
+    if (modalEl && (window as any).bootstrap) {
+      this.modalRef = new (window as any).bootstrap.Modal(modalEl);
+      this.modalRef.show();
+    }
   }
 
   closeModal() {
-    this.isModalVisible = false;
+    if (this.modalRef) this.modalRef.hide();
   }
 
   saveReport() {
-    if (!this.equipoId || !this.estado) return;
+    if (!this.equipoId || !this.estado) {
+      Swal.fire('Error', 'Por favor completa todos los campos obligatorios.', 'warning');
+      return;
+    }
 
     const newReport = {
       equipoId: this.equipoId,
@@ -85,9 +104,25 @@ export class CheckreportComponent implements OnInit {
       observaciones: this.observaciones
     };
 
-    this.reportService.addReport(newReport).subscribe(() => {
-      this.loadReports();
-      this.closeModal();
+    this.reportService.addReport(newReport).subscribe({
+      next: () => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Chequeo guardado correctamente',
+          timer: 1500,
+          showConfirmButton: false
+        });
+        this.loadReports();
+        this.clearModal();
+        this.closeModal();
+      },
+      error: () => Swal.fire('Error', 'No se pudo guardar el reporte.', 'error')
     });
+  }
+
+  clearModal(){
+    this.equipoId = 0;
+    this.estado = '';
+    this.observaciones = '';
   }
 }

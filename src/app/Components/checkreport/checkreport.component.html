@@ -1,77 +1,131 @@
-<div class="check-report-container">
-  <h1>Registro de Reporte de Chequeos</h1>
+<div class="container mt-4">
+  <h1 class="text-center mb-4 text-primary fw-bold">Registro de Reporte de Chequeos</h1>
 
-  <div class="filtro-bar">
-  <input 
-    type="text" 
-    class="filtro-input"
-    placeholder="Buscar reporte por equipo, usuario o estado..."
-    [(ngModel)]="filterText"
-    (ngModelChange)="filterReports()" 
-  />
+  <div class="d-flex mb-3 justify-content-between align-items-center">
+    <input
+      type="text"
+      class="form-control w-50"
+      placeholder="Buscar por equipo, usuario o estado..."
+      [(ngModel)]="filterText"
+      (ngModelChange)="loadReports()"
+    />
 
-  <button class="btn-guardar" (click)="openModal()">Agregar Nuevo Chequeo</button>
-  <button class="btn-ver-todos" (click)="loadReports()">Actualizar Tabla</button>
-</div>
+    <div>
+      <button class="btn btn-outline-primary me-2 fw-semibold shadow-sm" (click)="openModal()">
+        <i class="bi bi-plus-circle"></i> Nuevo Chequeo
+      </button>
+    </div>
+  </div>
 
-
-  <!-- Tabla de reportes -->
-  <div class="table-container">
-    <table class="tabla-equipos" *ngIf="!loading && filteredReports.length > 0; else noReports">
-      <thead>
+  <div class="table-responsive shadow-sm rounded-4 overflow-hidden">
+    <table class="table table-hover text-center table-custom">
+      <thead class="table-primary">
         <tr>
           <th>ID</th>
-          <th>Equipo</th>
+          <th>Equipo-Serie</th>
           <th>Modelo</th>
-          <th>Ubicacion</th>
+          <th>Ubicación</th>
           <th>Usuario</th>
           <th>Estado</th>
+          <th>Fecha / Hora</th>
           <th>Observaciones</th>
-          <th>Fecha/Hora</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let r of filteredReports">
+        <tr *ngFor="let r of (reports$ | async)">
           <td>{{ r.id }}</td>
-          <td>{{ r.Equipo?.nombres }}</td>
+          <td>{{ r.Equipo?.nombres }} {{ r.Equipo?.serie }}</td>
           <td>{{ r.Equipo?.modelo }}</td>
           <td>{{ r.Equipo?.ubicacion }} {{ r.Equipo?.ubicacionEspecifica }}</td>
           <td>{{ r.User?.nombres }}</td>
           <td>{{ r.estado }}</td>
+          <td>{{ r.fecha_hora | date: 'short' }}</td>
           <td>{{ r.observaciones }}</td>
-          <td>{{ r.fecha_hora | date:'short' }}</td>
         </tr>
       </tbody>
     </table>
   </div>
 
+  <ng-template #noReports>
+    <div class="text-center mt-4 text-secondary">
+      <i class="bi bi-exclamation-circle"></i> No hay reportes disponibles.
+    </div>
+  </ng-template>
+</div>
 
+<div
+  class="modal fade"
+  id="addReportModal"
+  tabindex="-1"
+  aria-labelledby="addReportModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content shadow-lg rounded-4">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title fw-semibold" id="addReportModalLabel">Nuevo Chequeo</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
 
-  <!-- Modal para agregar nuevo reporte -->
-  <div class="modal" [class.show]="isModalVisible">
-    <div class="modal-content">
-      <span class="close" (click)="closeModal()">&times;</span>
-      <h2>Nuevo Chequeo</h2>
+      <form (ngSubmit)="saveReport()">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Equipo</label>
+            <select
+              class="form-select"
+              [(ngModel)]="equipoId"
+              name="equipoId"
+              required
+            >
+              <option value="" disabled selected>Selecciona un equipo</option>
+              <option *ngFor="let e of equipos" [value]="e.id">
+                {{ e.nombres }} / {{ e.serie }}
+              </option>
+            </select>
+          </div>
 
-      <form (ngSubmit)="saveReport(); closeModal()">
-        <label>Equipo:</label>
-        <select [(ngModel)]="equipoId" name="equipoId" required>
-          <option *ngFor="let e of equipos" [value]="e.id">{{ e.nombres }}</option>
-        </select>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Estado</label>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="estado"
+              name="estado"
+              placeholder="Ej: Operativo, En revisión..."
+              required
+            />
+          </div>
 
-        <label>Estado:</label>
-        <input type="text" [(ngModel)]="estado" name="estado" required />
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Observaciones</label>
+            <textarea
+              class="form-control"
+              [(ngModel)]="observaciones"
+              name="observaciones"
+              rows="3"
+              placeholder="Observaciones del chequeo..."
+            ></textarea>
+          </div>
+        </div>
 
-        <label>Observaciones:</label>
-        <textarea [(ngModel)]="observaciones" name="observaciones"></textarea>
-
-        <button type="submit" class="btn-guardar">Guardar Chequeo</button>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary fw-semibold"
+            data-bs-dismiss="modal"
+          >
+            Cerrar
+          </button>
+          <button type="submit" class="btn btn-success fw-semibold">
+            Guardar Chequeo
+          </button>
+        </div>
       </form>
     </div>
   </div>
-
-  <ng-template #noReports>
-    <p *ngIf="!loading">No hay reportes que coincidan con la búsqueda.</p>
-  </ng-template>
-
 </div>
